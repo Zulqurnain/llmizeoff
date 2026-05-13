@@ -6,18 +6,30 @@
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
+      "react-native": "./dist/react-native.js",
       "browser": "./dist/client.js",
-      "react-native": "./dist/client.js",
       "default": "./dist/index.js"
     },
     "./client": {
       "default": "./dist/client.js",
       "types": "./dist/client.d.ts"
     },
+    "./react-native": {
+      "default": "./dist/react-native.js",
+      "types": "./dist/react-native.d.ts"
+    },
     "./server": {
       "default": "./dist/server.js",
       "types": "./dist/server.d.ts"
     }
+  },
+  "peerDependencies": {
+    "llama.rn": ">=0.8.0",
+    "react-native-fs": ">=2.0.0"
+  },
+  "peerDependenciesMeta": {
+    "llama.rn": { "optional": true },
+    "react-native-fs": { "optional": true }
   },
   "bin": {
     "offl-llama": "dist/cli.js"

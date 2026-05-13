@@ -4,6 +4,10 @@ export { createServer, startServer } from "./server";
 export { downloadModel, getModelPath, getDefaultModelDir, BUNDLED_MODELS, DEFAULT_MODEL } from "./downloader";
 export type { Message, ChatOptions, CompletionOptions, ModelConfig, ServerConfig, OpenAIChatResponse } from "./types";
 
-// Universal client — works in browser, React Native, Kotlin/JS, Node.js, Deno, Bun
+// Universal HTTP client — works in browser, Kotlin/JS, Node.js, Deno, Bun
 export { OffLlamaClient, OffLlamaError, createClient } from "./client";
 export type { ClientConfig, ClientMessage, ChatRequest, CompletionRequest, ChatResponse, CompletionResponse, ModelList } from "./client";
+
+// React Native adapter — offline on-device inference via llama.rn + HTTP fallback
+export { createMobileEngine, isModelDownloaded, MOBILE_MODELS } from "./react-native";
+export type { MobileEngine, MobileEngineConfig } from "./react-native";
