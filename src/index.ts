@@ -11,3 +11,7 @@ export type { ClientConfig, ClientMessage, ChatRequest, CompletionRequest, ChatR
 // React Native adapter — offline on-device inference via llama.rn + HTTP fallback
 export { createMobileEngine, isModelDownloaded, MOBILE_MODELS } from "./react-native";
 export type { MobileEngine, MobileEngineConfig } from "./react-native";
+
+// NanoExtractor — zero-model regex extraction + template generation (< 100 MB apps)
+export { extractLeads, buildOutreachEmail, buildOutreachMessage } from "./nano-extractor";
+export type { ExtractedLeads, MessageTemplate, TemplateVars } from "./nano-extractor";

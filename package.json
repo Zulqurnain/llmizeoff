@@ -21,6 +21,10 @@
     "./server": {
       "default": "./dist/server.js",
       "types": "./dist/server.d.ts"
+    },
+    "./nano": {
+      "default": "./dist/nano-extractor.js",
+      "types": "./dist/nano-extractor.d.ts"
     }
   },
   "peerDependencies": {

@@ -179,25 +179,41 @@ async function isModelDownloaded(config) {
         return false;
     }
 }
-/** Recommended small models that fit in < 1 GB device storage. */
+/**
+ * Recommended models for mobile.
+ *
+ * BUNDLABLE models (< 80 MB) can be shipped INSIDE your app so users never
+ * download anything. Add the .gguf file to android/app/src/main/assets/ and
+ * ios/<AppName>/ then pass `modelDir` pointing to the assets path.
+ *
+ * Total app size = RN framework (~20 MB) + model. SMOL_135M_NANO fits
+ * comfortably under 100 MB.
+ */
 exports.MOBILE_MODELS = {
-    /** ~290 MB — fastest, use for simple tasks */
+    /**
+     * ~75 MB — BUNDLABLE in app assets. Fits in < 100 MB total.
+     * Best for simple extraction, classification, short generation.
+     * 135M parameters, Q4_K_M quantization.
+     */
+    SMOL_135M_NANO: {
+        url: "https://huggingface.co/HuggingFaceTB/SmolLM2-135M-Instruct-GGUF/resolve/main/smollm2-135m-instruct-q4_k_m.gguf",
+        fileName: "smollm2-135m-q4.gguf",
+        sizeMb: 75,
+        bundlable: true,
+    },
+    /** ~290 MB — downloaded post-install. Best balance for mobile. */
     QWEN_0_5B: {
         url: "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/qwen2.5-0.5b-instruct-q4_k_m.gguf",
         fileName: "qwen2.5-0.5b-q4.gguf",
         sizeMb: 290,
+        bundlable: false,
     },
-    /** ~530 MB — good balance of speed and quality */
+    /** ~530 MB — downloaded post-install. Good quality. */
     QWEN_1_5B: {
         url: "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q4_k_m.gguf",
         fileName: "qwen2.5-1.5b-q4.gguf",
         sizeMb: 530,
-    },
-    /** ~1 GB — best quality for mobile */
-    PHI3_MINI: {
-        url: "https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-gguf/resolve/main/Phi-3-mini-4k-instruct-q4.gguf",
-        fileName: "phi3-mini-q4.gguf",
-        sizeMb: 1000,
+        bundlable: false,
     },
 };
 //# sourceMappingURL=react-native.js.map

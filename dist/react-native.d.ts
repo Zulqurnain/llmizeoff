@@ -101,25 +101,41 @@ export declare function createMobileEngine(config: MobileEngineConfig): Promise<
  * Use this to show a "download required" prompt before calling createMobileEngine.
  */
 export declare function isModelDownloaded(config: Pick<MobileEngineConfig, "modelDir" | "modelFileName" | "modelUrl">): Promise<boolean>;
-/** Recommended small models that fit in < 1 GB device storage. */
+/**
+ * Recommended models for mobile.
+ *
+ * BUNDLABLE models (< 80 MB) can be shipped INSIDE your app so users never
+ * download anything. Add the .gguf file to android/app/src/main/assets/ and
+ * ios/<AppName>/ then pass `modelDir` pointing to the assets path.
+ *
+ * Total app size = RN framework (~20 MB) + model. SMOL_135M_NANO fits
+ * comfortably under 100 MB.
+ */
 export declare const MOBILE_MODELS: {
-    /** ~290 MB — fastest, use for simple tasks */
+    /**
+     * ~75 MB — BUNDLABLE in app assets. Fits in < 100 MB total.
+     * Best for simple extraction, classification, short generation.
+     * 135M parameters, Q4_K_M quantization.
+     */
+    readonly SMOL_135M_NANO: {
+        readonly url: "https://huggingface.co/HuggingFaceTB/SmolLM2-135M-Instruct-GGUF/resolve/main/smollm2-135m-instruct-q4_k_m.gguf";
+        readonly fileName: "smollm2-135m-q4.gguf";
+        readonly sizeMb: 75;
+        readonly bundlable: true;
+    };
+    /** ~290 MB — downloaded post-install. Best balance for mobile. */
     readonly QWEN_0_5B: {
         readonly url: "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/qwen2.5-0.5b-instruct-q4_k_m.gguf";
         readonly fileName: "qwen2.5-0.5b-q4.gguf";
         readonly sizeMb: 290;
+        readonly bundlable: false;
     };
-    /** ~530 MB — good balance of speed and quality */
+    /** ~530 MB — downloaded post-install. Good quality. */
     readonly QWEN_1_5B: {
         readonly url: "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q4_k_m.gguf";
         readonly fileName: "qwen2.5-1.5b-q4.gguf";
         readonly sizeMb: 530;
-    };
-    /** ~1 GB — best quality for mobile */
-    readonly PHI3_MINI: {
-        readonly url: "https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-gguf/resolve/main/Phi-3-mini-4k-instruct-q4.gguf";
-        readonly fileName: "phi3-mini-q4.gguf";
-        readonly sizeMb: 1000;
+        readonly bundlable: false;
     };
 };
 //# sourceMappingURL=react-native.d.ts.map
