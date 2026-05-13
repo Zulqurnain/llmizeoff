@@ -1,9 +1,24 @@
 {
   "name": "offllama",
-  "version": "0.1.0",
-  "description": "offLLama — Run llama.cpp inference on any Node.js host (cPanel, shared hosting). No VPS or GPU required. OpenAI-compatible API.",
+  "version": "0.2.0",
+  "description": "offLLama — Run llama.cpp inference on any Node.js host (cPanel, shared hosting). Universal HTTP client for browser, React Native, Kotlin/JS. No VPS or GPU required.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "browser": "./dist/client.js",
+      "react-native": "./dist/client.js",
+      "default": "./dist/index.js"
+    },
+    "./client": {
+      "default": "./dist/client.js",
+      "types": "./dist/client.d.ts"
+    },
+    "./server": {
+      "default": "./dist/server.js",
+      "types": "./dist/server.d.ts"
+    }
+  },
   "bin": {
     "offl-llama": "dist/cli.js"
   },
@@ -13,7 +28,10 @@
     "download": "node dist/cli.js download",
     "dev": "ts-node src/server.ts"
   },
-  "keywords": ["offllama", "llama", "llm", "cpanel", "shared-hosting", "inference", "openai-compatible"],
+  "keywords": [
+    "offllama", "llama", "llm", "cpanel", "shared-hosting", "inference",
+    "openai-compatible", "react-native", "browser", "edge", "offline-ai"
+  ],
   "author": "Zulqurnain Haider",
   "license": "MIT",
   "dependencies": {
