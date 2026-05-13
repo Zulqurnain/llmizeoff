@@ -1,173 +1,229 @@
 # offLLama
 
-Run llama.cpp inference on **any Node.js host** — including cPanel shared hosting. No VPS, no GPU, no cloud API key required.
+Run LLM inference on **any Node.js host** — cPanel shared hosting, VPS, Raspberry Pi — with zero cloud dependencies. Also ships a universal HTTP client for **browser, React Native, Kotlin/Android**, and a **native Android module** (JNI/NDK) for fully offline on-device AI.
 
-offLLama wraps [`node-llama-cpp`](https://github.com/withcatai/node-llama-cpp) and exposes:
-- An **OpenAI-compatible HTTP API** (`/v1/chat/completions`, `/v1/completions`)
-- An **embeddable JS module** (`LlamaEngine`) you can import directly in your app
-- A **CLI** for downloading models and chatting in the terminal
+[![npm](https://img.shields.io/npm/v/offllama?style=flat-square)](https://www.npmjs.com/package/offllama)
+[![license](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 
 ---
 
-## Quick start
+## What's inside
+
+| Export | Environment | Description |
+|--------|-------------|-------------|
+| `offllama` (default) | Node.js / cPanel | Embedded inference via `node-llama-cpp` + OpenAI-compatible HTTP server |
+| `offllama/client` | Browser, RN, Node.js, Deno, Bun | Zero-dependency HTTP client for any offLLama server |
+| `offllama/react-native` | React Native (iOS + Android) | Offline on-device inference via `llama.rn` OR HTTP fallback |
+| `offllama/nano` | Any | Zero-model regex extraction + template message builders |
+| `android/` | Kotlin / Android native | Full JNI/NDK library — 100% offline, no server needed |
+
+---
+
+## Quick start (Node.js / cPanel)
 
 ```bash
 npm install offllama
 
-# Download the default model (~400MB, fits in 512MB RAM)
-npx offllama download
+# Download default model (~400 MB, auto on first request)
+npx offl-llama download
 
-# Start the OpenAI-compatible server
-npx offllama serve --port 8080
+# Start OpenAI-compatible server
+npx offl-llama serve --port 8080 --api-key my-secret
 ```
 
-Then call it like any OpenAI-compatible API:
+Call it from anywhere:
 ```bash
 curl http://localhost:8080/v1/chat/completions \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer my-secret" \
   -d '{"messages":[{"role":"user","content":"Hello!"}]}'
 ```
 
 ---
 
-## Models
+## Embed in Next.js / Express (no separate server)
 
-| Key | Name | Size | RAM needed |
-|-----|------|------|------------|
-| `qwen2.5-0.5b` (default) | Qwen2.5-0.5B Instruct Q4_K_M | ~400MB | ~512MB |
-| `qwen2.5-1.5b` | Qwen2.5-1.5B Instruct Q4_K_M | ~1GB | ~1.5GB |
-| `tinyllama` | TinyLlama-1.1B Chat Q4_K_M | ~670MB | ~1GB |
-
-```bash
-npx offllama list              # list all available models
-npx offllama download qwen2.5-1.5b  # download a specific model
-```
-
-Set `OFFL_LLAMA_MODEL_PATH` env var to use your own GGUF file.
-
----
-
-## cPanel deployment
-
-offLLama is designed to run as a **second cPanel Node.js App** alongside your main app. The main app calls it on localhost.
-
-### 1. Create a new Node.js App in cPanel
-
-1. cPanel → **Software** → **Setup Node.js App**
-2. Click **Create Application**
-3. Set:
-   - **Node.js version**: 18+ (or latest available)
-   - **Application mode**: Production
-   - **Application root**: `offllama` (creates `~/offllama/`)
-   - **Application URL**: `offllama.yourdomain.com` (or a path)
-   - **Application startup file**: `startup.js`
-4. Click **Create**
-
-### 2. Install and configure
-
-```bash
-# SSH into your server (or use cPanel Terminal)
-cd ~/offllama
-npm install offllama
-node node_modules/offllama/src/startup.js  # or copy startup.js here
-```
-
-Or FTP/upload these files to `~/offllama/`:
-```
-~/offllama/
-  package.json      {"name":"app","dependencies":{"offllama":"^0.1.0"}}
-  startup.js        (copy from node_modules/offllama/src/startup.js)
-  .env              OFFL_LLAMA_API_KEY=your_secret_key
-  models/           (auto-created when model downloads)
-```
-
-### 3. Download the model
-
-The model auto-downloads on first request. To pre-download:
-
-```bash
-cd ~/offllama
-OFFL_LLAMA_MODEL_DIR=./models node -e "require('offllama').downloadModel()"
-```
-
-### 4. Call it from your main app
-
-```javascript
-// In your Next.js API route or Express handler:
-const response = await fetch("http://localhost:8080/v1/chat/completions", {
-  method: "POST",
-  headers: { "Content-Type": "application/json", "Authorization": "Bearer your_secret_key" },
-  body: JSON.stringify({
-    messages: [
-      { role: "system", content: "You are a helpful assistant." },
-      { role: "user", content: "Extract emails from this text: ..." }
-    ]
-  })
-});
-const data = await response.json();
-console.log(data.choices[0].message.content);
-```
-
----
-
-## Embed directly (no HTTP server)
-
-If your app and the model are in the same process:
-
-```javascript
+```ts
 import { LlamaEngine } from "offllama";
 
-const llama = new LlamaEngine();
+const llama = new LlamaEngine({ contextSize: 2048 });
 await llama.load(); // auto-downloads model on first run
 
 const reply = await llama.chat([
-  { role: "system", content: "You extract email addresses from text." },
-  { role: "user", content: "Contact: john@example.com or jane@corp.io" }
+  { role: "system", content: "You extract lead information from text." },
+  { role: "user",   content: "Contact Sarah at sarah@acme.com or +44 7700 123456" }
 ]);
 console.log(reply);
 ```
 
----
-
-## CLI reference
-
-```
-offllama download [model]     Download a model (default: qwen2.5-0.5b)
-offllama list                 List available models
-offllama serve [options]      Start OpenAI-compatible HTTP server
-offllama chat [options]       Interactive terminal chat
-```
-
-Options for `serve`:
-```
--p, --port <port>       Port (default: 8080)
---host <host>           Host (default: 0.0.0.0)
---api-key <key>         Bearer token for auth (optional)
---model <path>          Path to GGUF model file
---context-size <size>   Context window size (default: 2048)
-```
+Set `serverExternalPackages: ["offllama", "node-llama-cpp"]` in `next.config.ts`.
 
 ---
 
-## Environment variables
+## Universal HTTP client (browser / React Native / Kotlin/JS)
+
+Zero dependencies — uses the native `fetch` API. Works everywhere.
+
+```ts
+import { createClient } from "offllama/client";
+
+const client = createClient({
+  baseUrl: "https://tools.example.com/ai",
+  apiKey: "my-secret",      // optional
+  timeout: 30_000,
+});
+
+// Simple ask
+const reply = await client.ask("Draft a short intro email for a job application");
+
+// Full chat
+const resp = await client.chat([
+  { role: "system",  content: "You are a concise assistant." },
+  { role: "user",    content: "What is machine learning?" },
+]);
+console.log(resp.choices[0].message.content);
+```
+
+---
+
+## React Native — offline AI (< 100 MB app)
+
+Uses `llama.rn` for on-device inference. Falls back to HTTP if `serverUrl` is set.
+
+**App stays under 100 MB** by bundling SmolLM2-135M (~75 MB) directly in assets.
+
+```bash
+npm install offllama llama.rn react-native-fs
+cd ios && pod install
+```
+
+```ts
+import { createMobileEngine, MOBILE_MODELS } from "offllama/react-native";
+
+// Offline — model bundled in app assets (no download)
+const engine = await createMobileEngine({
+  modelUrl:      MOBILE_MODELS.SMOL_135M_NANO.url,
+  modelFileName: MOBILE_MODELS.SMOL_135M_NANO.fileName, // 75 MB
+  onDownloadProgress: (pct) => console.log(`Downloading ${pct}%`),
+});
+
+const reply = await engine.ask("Write a professional intro message");
+await engine.release();
+
+// Online — connects to your offLLama server (no model on device)
+const engine = await createMobileEngine({ serverUrl: "https://tools.example.com/ai" });
+```
+
+### Bundlable models (fit inside app, no download after install)
+
+| Constant | Size | Notes |
+|----------|------|-------|
+| `SMOL_135M_NANO` | ~75 MB | **Fits in < 100 MB app.** Simple tasks. |
+| `QWEN_0_5B` | ~290 MB | Better quality, download at first launch |
+| `QWEN_1_5B` | ~530 MB | Best mobile quality, download at first launch |
+
+---
+
+## Android Native (Kotlin) — 100% offline, no server
+
+See [`android/README.md`](android/README.md) for full setup.
+
+```kotlin
+// Add to app/src/main/assets/smollm2-135m-q4.gguf (~75 MB)
+val engine = OffLlamaEngine(context)
+engine.loadFromAssets(OffLlamaEngine.MODEL_SMOL_135M)
+
+val reply = engine.ask(
+    userMessage  = "Write a short job application message",
+    systemPrompt = "You are a helpful assistant. Be concise.",
+    maxTokens    = 200,
+)
+engine.release()
+```
+
+For HTTP (connecting to your cPanel server):
+```kotlin
+val client = OffLlamaClient("https://tools.example.com/ai", apiKey = "my-secret")
+val reply = client.ask("Extract emails from: john@corp.com")
+```
+
+---
+
+## Zero-model extraction (offllama/nano)
+
+For apps that don't need AI generation at all — extracts leads with pure regex:
+
+```ts
+import { extractLeads, buildOutreachEmail } from "offllama/nano";
+
+const leads = extractLeads(`
+  Hi, I'm Sarah Connor from Skynet. Reach me at sarah@skynet.io
+  or WhatsApp +44 7700 123456 or Telegram @sarahc
+`);
+// { emails: ["sarah@skynet.io"], phones: ["+447700123456"],
+//   telegram: ["@sarahc"], names: ["Sarah Connor"], ... }
+
+const email = buildOutreachEmail({
+  senderName: "John Smith",
+  recipientName: "Sarah",
+  jobTitle: "Software Engineer",
+  company: "Skynet",
+});
+// { subject: "Application for Software Engineer at Skynet — John Smith",
+//   body: "Hi Sarah, ..." }
+```
+
+---
+
+## cPanel Deployment
+
+offLLama is designed to run as a Passenger Node.js app on cPanel shared hosting.
+
+```
+~/your-app/
+  startup.js        ← reads .env, starts server.js
+  server.js         ← Next.js standalone server
+  .env              ← credentials (never in webroot)
+  node_modules/
+    offllama/
+    node-llama-cpp/
+```
+
+See the [Text To Leads Extractor](https://github.com/Zulqurnain/text-to-leads-extractor) for a production example with GitHub Actions deploy.
+
+---
+
+## Environment Variables
 
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `PORT` | `8080` | Server port |
 | `HOSTNAME` | `0.0.0.0` | Server host |
-| `OFFL_LLAMA_API_KEY` | (none) | Bearer auth key |
-| `OFFL_LLAMA_MODEL_PATH` | auto | Path to GGUF model |
+| `OFFL_LLAMA_API_KEY` | — | Bearer auth key (optional) |
+| `OFFL_LLAMA_MODEL_PATH` | auto | Path to custom GGUF model |
 | `OFFL_LLAMA_MODEL_DIR` | `./models` | Directory for downloaded models |
 | `OFFL_LLAMA_CONTEXT_SIZE` | `2048` | Context window size |
 
 ---
 
+## Models (CLI)
+
+```bash
+npx offl-llama download              # default: qwen2.5-0.5b (~400 MB)
+npx offl-llama download qwen2.5-1.5b
+npx offl-llama list
+npx offl-llama serve --port 8080 --api-key secret
+npx offl-llama chat
+```
+
+---
+
 ## Requirements
 
-- Node.js 18+
-- Linux x64 (cPanel shared hosting) or macOS/Windows (dev)
-- ~512MB free RAM for the default model
-- ~400MB disk for the model file
+- **Server mode**: Node.js 18+, Linux x64 (or macOS/Windows for dev), ~512 MB RAM
+- **Client**: any environment with `fetch` (browser, RN, Node 18+, Deno, Bun)
+- **Android module**: NDK 26+, CMake 3.22+, `minSdkVersion 24`
+- **React Native**: RN 0.71+, `llama.rn ≥ 0.8.0`, `react-native-fs ≥ 2.0.0` (peer deps)
 
 ---
 
