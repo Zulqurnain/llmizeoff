@@ -9,6 +9,7 @@
   },
   "scripts": {
     "build": "tsc",
+    "prepare": "npm run build",
     "start": "node dist/server.js",
     "download": "node dist/cli.js download",
     "dev": "ts-node src/server.ts"

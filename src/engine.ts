@@ -1,21 +1,30 @@
 import * as path from "path";
+import type {
+  Llama,
+  LlamaModel,
+  LlamaContext,
+  LlamaChatSession,
+} from "node-llama-cpp";
 import { Message, ChatOptions, CompletionOptions, ModelConfig } from "./types";
 import { downloadModel, getModelPath, DEFAULT_MODEL } from "./downloader";
 
-let llamaModule: typeof import("node-llama-cpp") | null = null;
+type LlamaModule = typeof import("node-llama-cpp");
 
-async function getLlamaCpp() {
-  if (!llamaModule) {
-    llamaModule = await import("node-llama-cpp");
-  }
-  return llamaModule;
+let cachedModule: LlamaModule | null = null;
+
+async function getLlamaCpp(): Promise<LlamaModule> {
+  if (cachedModule) return cachedModule;
+  cachedModule = await import("node-llama-cpp") as LlamaModule;
+  return cachedModule;
 }
 
 export class LlamaEngine {
   private config: ModelConfig;
-  private model: unknown = null;
-  private context: unknown = null;
-  private modelPath: string | null = null;
+  private llama: Llama | null = null;
+  private model: LlamaModel | null = null;
+  private ctx: LlamaContext | null = null;
+  private session: LlamaChatSession | null = null;
+  private resolvedModelPath: string | null = null;
 
   constructor(config: ModelConfig = {}) {
     this.config = {
@@ -26,57 +35,58 @@ export class LlamaEngine {
   }
 
   async load(autoDownload = true): Promise<void> {
-    const { getLlama, LlamaChatSession } = await getLlamaCpp();
-    void LlamaChatSession;
+    const { getLlama } = await getLlamaCpp();
 
     let modelPath = this.config.modelPath;
     if (!modelPath) {
       modelPath = getModelPath(DEFAULT_MODEL);
       const fs = await import("fs");
       if (!fs.existsSync(modelPath)) {
-        if (!autoDownload) throw new Error(`Model not found: ${modelPath}. Run 'offl-llama download' first.`);
-        console.log("Model not found. Auto-downloading...");
+        if (!autoDownload) {
+          throw new Error(`Model not found at ${modelPath}. Run: npx offllama download`);
+        }
+        console.log("Model not found locally. Auto-downloading (this happens once)...");
         await downloadModel(DEFAULT_MODEL);
       }
     }
 
-    this.modelPath = modelPath;
+    this.resolvedModelPath = modelPath;
     console.log(`Loading model: ${path.basename(modelPath)}`);
 
-    const llama = await getLlama({
-      gpu: false,
-    });
+    this.llama = await getLlama({ gpu: false });
+    this.model = await this.llama.loadModel({ modelPath });
+    this.ctx = await this.model.createContext({ contextSize: this.config.contextSize ?? 2048 });
 
-    this.model = await (llama as { loadModel: (opts: unknown) => Promise<unknown> }).loadModel({
-      modelPath,
-      gpuLayers: this.config.gpuLayers ?? 0,
-    });
+    const { LlamaChatSession } = await getLlamaCpp();
+    this.session = new LlamaChatSession({ contextSequence: this.ctx.getSequence() });
 
-    this.context = await (this.model as { createContext: (opts: unknown) => Promise<unknown> }).createContext({
-      contextSize: this.config.contextSize ?? 2048,
-    });
+    console.log("Model loaded and ready.");
+  }
 
-    console.log("Model loaded.");
+  private async ensureLoaded(): Promise<void> {
+    if (!this.session) await this.load(true);
   }
 
   async chat(messages: Message[], opts: ChatOptions = {}): Promise<string> {
-    if (!this.model || !this.context) await this.load();
+    await this.ensureLoaded();
 
+    // Re-create session for each chat to avoid accumulated context blowing up memory
     const { LlamaChatSession } = await getLlamaCpp();
+    const session = new LlamaChatSession({ contextSequence: this.ctx!.getSequence() });
 
-    const session = new LlamaChatSession({
-      contextSequence: await (this.context as { getSequence: () => Promise<unknown> }).getSequence(),
-    });
+    const system = opts.systemPrompt ?? messages.find(m => m.role === "system")?.content;
+    const turns = messages.filter(m => m.role === "user" || m.role === "assistant");
 
-    const systemMsg = opts.systemPrompt ?? messages.find(m => m.role === "system")?.content;
-    const userMsgs = messages.filter(m => m.role !== "system");
-
-    if (systemMsg) {
-      await (session as unknown as { setSystemPrompt: (p: string) => Promise<void> }).setSystemPrompt?.(systemMsg);
+    if (system) {
+      // Seed the session with a system message via a priming exchange
+      await session.prompt(
+        `[system]: ${system}\n[user]: OK\n`,
+        { maxTokens: 5, temperature: 0 }
+      );
     }
 
     let response = "";
-    for (const msg of userMsgs) {
+    for (const msg of turns) {
       if (msg.role === "user") {
         response = await session.prompt(msg.content, {
           maxTokens: opts.maxTokens ?? 512,
@@ -84,36 +94,33 @@ export class LlamaEngine {
         });
       }
     }
+
+    await session.dispose();
     return response;
   }
 
   async complete(prompt: string, opts: CompletionOptions = {}): Promise<string> {
-    if (!this.model || !this.context) await this.load();
+    await this.ensureLoaded();
 
     const { LlamaCompletion } = await getLlamaCpp();
-
-    const completion = new LlamaCompletion({
-      contextSequence: await (this.context as { getSequence: () => Promise<unknown> }).getSequence(),
-    });
-
-    return completion.generateCompletion(prompt, {
-      maxTokens: opts.maxTokens ?? 512,
+    const completion = new LlamaCompletion({ contextSequence: this.ctx!.getSequence() });
+    const result = await completion.generateCompletion(prompt, {
+      maxTokens: opts.maxTokens ?? 256,
       temperature: opts.temperature ?? 0.7,
+      customStopTriggers: opts.stopSequences,
     });
+    await completion.dispose();
+    return result;
   }
 
   getModelName(): string {
-    return this.modelPath ? path.basename(this.modelPath) : "not loaded";
+    return this.resolvedModelPath ? path.basename(this.resolvedModelPath) : "not loaded";
   }
 
   async unload(): Promise<void> {
-    if (this.context) {
-      await (this.context as { dispose: () => Promise<void> }).dispose?.();
-      this.context = null;
-    }
-    if (this.model) {
-      await (this.model as { dispose: () => Promise<void> }).dispose?.();
-      this.model = null;
-    }
+    if (this.session) { await this.session.dispose(); this.session = null; }
+    if (this.ctx)     { await this.ctx.dispose(); this.ctx = null; }
+    if (this.model)   { await this.model.dispose(); this.model = null; }
+    if (this.llama)   { await this.llama.dispose(); this.llama = null; }
   }
 }
