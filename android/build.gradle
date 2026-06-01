@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace 'com.offllama'
+    namespace 'com.llmizeoff'
     compileSdk 34
 
     defaultConfig {

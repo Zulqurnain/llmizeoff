@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(offllama)
+project(llmizeoff)
 
 # ── llama.cpp source ──────────────────────────────────────────────────────────
 # Clone llama.cpp into android/llama.cpp/ once:
@@ -24,16 +24,16 @@ endif()
 
 add_subdirectory(${LLAMA_CPP_DIR} ${CMAKE_BINARY_DIR}/llama.cpp)
 
-# ── offllama JNI shared library ───────────────────────────────────────────────
-add_library(offllama SHARED offllama_jni.cpp)
+# ── llmizeoff JNI shared library ───────────────────────────────────────────────
+add_library(llmizeoff SHARED llmizeoff_jni.cpp)
 
-target_include_directories(offllama PRIVATE
+target_include_directories(llmizeoff PRIVATE
     ${LLAMA_CPP_DIR}/include
     ${LLAMA_CPP_DIR}/common
     ${LLAMA_CPP_DIR}/ggml/include
 )
 
-target_link_libraries(offllama
+target_link_libraries(llmizeoff
     llama
     common
     android
@@ -42,8 +42,8 @@ target_link_libraries(offllama
 
 # Strip debug symbols in release for smaller .so
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    target_compile_options(offllama PRIVATE -O2 -fvisibility=hidden)
-    set_target_properties(offllama PROPERTIES
+    target_compile_options(llmizeoff PRIVATE -O2 -fvisibility=hidden)
+    set_target_properties(llmizeoff PROPERTIES
         LINK_FLAGS "-Wl,--strip-all"
     )
 endif()

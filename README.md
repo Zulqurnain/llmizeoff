@@ -115,12 +115,12 @@ console.log(reply); // "The capital of France is Paris."
 ```kotlin
 // build.gradle
 dependencies {
-    implementation("com.github.Zulqurnain:llmizeoff-android:0.2.0")
+    implementation("com.github.Zulqurnain:llmizeoff-android:0.3.1")
 }
 ```
 
 ```kotlin
-val engine = OffLlamaEngine(context, modelPath = "models/qwen2.5-0.5b-q4_k_m.gguf")
+val engine = LlmizeOffEngine(context, modelPath = "models/qwen2.5-0.5b-q4_k_m.gguf")
 engine.load()
 val reply = engine.chat("Explain recursion in one sentence.")
 ```

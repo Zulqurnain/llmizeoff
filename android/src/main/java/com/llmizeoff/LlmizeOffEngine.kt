@@ -1,4 +1,4 @@
-package com.offllama
+package com.llmizeoff
 
 import android.content.Context
 import kotlinx.coroutines.Dispatchers
@@ -6,7 +6,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 /**
- * offLLama offline engine for Android.
+ * llmizeOFF offline engine for Android.
  *
  * Runs llama.cpp natively on-device via JNI — no server, no internet needed.
  * The GGUF model file is loaded from the device's local storage.
@@ -17,7 +17,7 @@ import java.io.File
  *
  * SETUP
  * -----
- * 1. Add the offllama AAR to your app (see build.gradle below)
+ * 1. Add the llmizeoff AAR to your app (see build.gradle below)
  * 2. Place the .gguf model file in assets/ or download it at runtime
  *
  * build.gradle (app):
@@ -28,19 +28,19 @@ import java.io.File
  *     }
  * }
  * dependencies {
- *     implementation 'com.github.Zulqurnain:offllama-android:0.2.1'
+ *     implementation 'com.github.Zulqurnain:llmizeoff-android:0.2.1'
  * }
  * ```
  *
  * Usage:
  * ```kotlin
- * val engine = OffLlamaEngine(context)
+ * val engine = LlmizeOffEngine(context)
  * engine.load("smollm2-135m-q4.gguf")   // from assets/
  * val reply = engine.ask("Write a short intro email for a job application")
  * engine.release()
  * ```
  */
-class OffLlamaEngine(private val context: Context) {
+class LlmizeOffEngine(private val context: Context) {
 
     private var nativeHandle: Long = 0L
     private var loaded = false
@@ -103,7 +103,7 @@ class OffLlamaEngine(private val context: Context) {
      * Chat with message history.
      */
     suspend fun chat(
-        messages: List<OffLlamaClient.Message>,
+        messages: List<LlmizeOffClient.Message>,
         maxTokens: Int = 512,
         temperature: Float = 0.7f,
     ): String = withContext(Dispatchers.IO) {
@@ -131,7 +131,7 @@ class OffLlamaEngine(private val context: Context) {
         return sb.toString()
     }
 
-    private fun buildChatPrompt(messages: List<OffLlamaClient.Message>): String {
+    private fun buildChatPrompt(messages: List<LlmizeOffClient.Message>): String {
         val sb = StringBuilder()
         messages.forEach { m ->
             sb.append("<|im_start|>${m.role}\n${m.content}<|im_end|>\n")
@@ -147,7 +147,7 @@ class OffLlamaEngine(private val context: Context) {
 
     companion object {
         init {
-            System.loadLibrary("offllama")
+            System.loadLibrary("llmizeoff")
         }
 
         /**

@@ -1,4 +1,4 @@
-package com.offllama
+package com.llmizeoff
 
 import android.content.Context
 import kotlinx.coroutines.Dispatchers
@@ -10,27 +10,27 @@ import java.net.URL
 /**
  * Downloads GGUF model files to app-private storage.
  *
- * Models are stored in context.filesDir/offllama_models/ and persist
+ * Models are stored in context.filesDir/llmizeoff_models/ and persist
  * across app restarts. Call [isDownloaded] first to avoid re-downloading.
  *
  * Usage:
  * ```kotlin
  * val downloader = ModelDownloader(context)
  *
- * if (!downloader.isDownloaded(OffLlamaEngine.MODEL_SMOL_135M)) {
+ * if (!downloader.isDownloaded(LlmizeOffEngine.MODEL_SMOL_135M)) {
  *     downloader.download(
- *         url      = OffLlamaEngine.MODEL_SMOL_135M_URL,
- *         fileName = OffLlamaEngine.MODEL_SMOL_135M,
+ *         url      = LlmizeOffEngine.MODEL_SMOL_135M_URL,
+ *         fileName = LlmizeOffEngine.MODEL_SMOL_135M,
  *     ) { percent -> updateProgressBar(percent) }
  * }
  *
- * val engine = OffLlamaEngine(context)
- * engine.load(downloader.modelPath(OffLlamaEngine.MODEL_SMOL_135M))
+ * val engine = LlmizeOffEngine(context)
+ * engine.load(downloader.modelPath(LlmizeOffEngine.MODEL_SMOL_135M))
  * ```
  */
 class ModelDownloader(context: Context) {
 
-    private val modelsDir = File(context.filesDir, "offllama_models").also { it.mkdirs() }
+    private val modelsDir = File(context.filesDir, "llmizeoff_models").also { it.mkdirs() }
 
     /** Absolute path to a downloaded model file. */
     fun modelPath(fileName: String): String = File(modelsDir, fileName).absolutePath
