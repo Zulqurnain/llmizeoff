@@ -1,4 +1,4 @@
-package com.offllama
+package com.llmizeoff
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -12,22 +12,22 @@ import java.net.URL
 import java.util.concurrent.TimeUnit
 
 /**
- * offLLama HTTP client for Android (Kotlin).
+ * llmizeOFF HTTP client for Android (Kotlin).
  *
  * Zero dependencies — uses Android's built-in HttpURLConnection.
- * Use this to connect your Android app to a self-hosted offLLama server
+ * Use this to connect your Android app to a self-hosted llmizeOFF server
  * running on cPanel / shared hosting.
  *
- * For fully offline inference (no server), use [OffLlamaEngine] instead.
+ * For fully offline inference (no server), use [LlmizeOffEngine] instead.
  *
  * Usage:
  * ```kotlin
- * val client = OffLlamaClient("https://tools.example.com/ai", apiKey = "optional")
+ * val client = LlmizeOffClient("https://tools.example.com/ai", apiKey = "optional")
  * val reply = client.ask("What is 2 + 2?")
  * println(reply) // "4"
  * ```
  */
-class OffLlamaClient(
+class LlmizeOffClient(
     private val baseUrl: String,
     private val apiKey: String? = null,
     private val timeoutMs: Int = 60_000,
@@ -103,7 +103,7 @@ class OffLlamaClient(
             if (code < 400) conn.inputStream else conn.errorStream
         )).use { it.readText() }
 
-        if (code >= 400) throw OffLlamaException(code, raw)
+        if (code >= 400) throw LlmizeOffException(code, raw)
 
         val json = JSONObject(raw)
         val choice = json.getJSONArray("choices").getJSONObject(0)
@@ -128,5 +128,5 @@ class OffLlamaClient(
     }
 }
 
-class OffLlamaException(val status: Int, message: String) :
-    Exception("offLLama HTTP $status: $message")
+class LlmizeOffException(val status: Int, message: String) :
+    Exception("llmizeOFF HTTP $status: $message")

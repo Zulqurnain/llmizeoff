@@ -7,11 +7,11 @@
 #include "llama.h"
 #include "common/common.h"
 
-#define LOG_TAG "offllama"
+#define LOG_TAG "llmizeoff"
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO,  LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
-struct OffLlamaContext {
+struct LlmizeOffContext {
     llama_model*   model   = nullptr;
     llama_context* ctx     = nullptr;
     llama_sampler* sampler = nullptr;
@@ -27,7 +27,7 @@ static std::string jstring_to_string(JNIEnv* env, jstring s) {
 extern "C" {
 
 JNIEXPORT jlong JNICALL
-Java_com_offllama_OffLlamaEngine_nativeLoad(
+Java_com_llmizeoff_LlmizeOffEngine_nativeLoad(
         JNIEnv* env, jobject /*obj*/,
         jstring modelPathJ, jint contextSize, jint threads)
 {
@@ -36,7 +36,7 @@ Java_com_offllama_OffLlamaEngine_nativeLoad(
 
     llama_backend_init();
 
-    auto* ctx_obj = new OffLlamaContext();
+    auto* ctx_obj = new LlmizeOffContext();
 
     // Model params
     auto mparams = llama_model_default_params();
@@ -74,7 +74,7 @@ Java_com_offllama_OffLlamaEngine_nativeLoad(
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_offllama_OffLlamaEngine_nativeGenerate(
+Java_com_llmizeoff_LlmizeOffEngine_nativeGenerate(
         JNIEnv* env, jobject /*obj*/,
         jlong handle, jstring promptJ, jint maxTokens, jfloat temperature)
 {
@@ -82,7 +82,7 @@ Java_com_offllama_OffLlamaEngine_nativeGenerate(
         return env->NewStringUTF("[error: model not loaded]");
     }
 
-    auto* c = reinterpret_cast<OffLlamaContext*>(handle);
+    auto* c = reinterpret_cast<LlmizeOffContext*>(handle);
     auto prompt = jstring_to_string(env, promptJ);
 
     // Tokenise
@@ -145,11 +145,11 @@ Java_com_offllama_OffLlamaEngine_nativeGenerate(
 }
 
 JNIEXPORT void JNICALL
-Java_com_offllama_OffLlamaEngine_nativeFree(
+Java_com_llmizeoff_LlmizeOffEngine_nativeFree(
         JNIEnv* /*env*/, jobject /*obj*/, jlong handle)
 {
     if (!handle) return;
-    auto* c = reinterpret_cast<OffLlamaContext*>(handle);
+    auto* c = reinterpret_cast<LlmizeOffContext*>(handle);
     if (c->sampler) llama_sampler_free(c->sampler);
     if (c->ctx)     llama_free(c->ctx);
     if (c->model)   llama_model_free(c->model);

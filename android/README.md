@@ -1,4 +1,4 @@
-# offLLama Android
+# llmizeOFF Android
 
 Run LLM inference **natively on Android** (Kotlin) — no server, no internet, 100% offline.
 
@@ -10,8 +10,8 @@ Uses llama.cpp via JNI/NDK. Works on ARM64 phones and x86_64 emulators.
 
 | Mode | Class | Internet needed? | Use case |
 |------|-------|-----------------|----------|
-| **Offline (on-device)** | `OffLlamaEngine` | No | Truly offline, private |
-| **Online (HTTP server)** | `OffLlamaClient` | Yes | Larger models on cPanel |
+| **Offline (on-device)** | `LlmizeOffEngine` | No | Truly offline, private |
+| **Online (HTTP server)** | `LlmizeOffClient` | Yes | Larger models on cPanel |
 
 ---
 
@@ -39,15 +39,15 @@ git clone --depth 1 https://github.com/ggerganov/llama.cpp \
 ### 2. Add to your app's `settings.gradle`
 
 ```groovy
-include ':offllama-android'
-project(':offllama-android').projectDir = new File('../offllama/android')
+include ':llmizeoff-android'
+project(':llmizeoff-android').projectDir = new File('../llmizeoff/android')
 ```
 
 ### 3. Add dependency in `app/build.gradle`
 
 ```groovy
 dependencies {
-    implementation project(':offllama-android')
+    implementation project(':llmizeoff-android')
 }
 ```
 
@@ -63,10 +63,10 @@ curl -L https://huggingface.co/HuggingFaceTB/SmolLM2-135M-Instruct-GGUF/resolve/
 **Option B — Download at first launch (for larger models):**
 ```kotlin
 val downloader = ModelDownloader(context)
-if (!downloader.isDownloaded(OffLlamaEngine.MODEL_QWEN_0_5B)) {
+if (!downloader.isDownloaded(LlmizeOffEngine.MODEL_QWEN_0_5B)) {
     downloader.download(
-        url      = OffLlamaEngine.MODEL_QWEN_0_5B_URL,
-        fileName = OffLlamaEngine.MODEL_QWEN_0_5B,
+        url      = LlmizeOffEngine.MODEL_QWEN_0_5B_URL,
+        fileName = LlmizeOffEngine.MODEL_QWEN_0_5B,
     ) { percent -> showProgress(percent) }
 }
 ```
@@ -76,19 +76,19 @@ if (!downloader.isDownloaded(OffLlamaEngine.MODEL_QWEN_0_5B)) {
 ## Offline usage (Kotlin)
 
 ```kotlin
-import com.offllama.OffLlamaEngine
+import com.llmizeoff.LlmizeOffEngine
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
-    private val engine = OffLlamaEngine(this)
+    private val engine = LlmizeOffEngine(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         lifecycleScope.launch {
             // Load from bundled assets/ — no download needed
-            engine.loadFromAssets(OffLlamaEngine.MODEL_SMOL_135M)
+            engine.loadFromAssets(LlmizeOffEngine.MODEL_SMOL_135M)
 
             // Ask anything
             val reply = engine.ask(
@@ -107,13 +107,13 @@ class MainActivity : AppCompatActivity() {
 }
 ```
 
-## Online usage (Kotlin) — connects to offLLama server on cPanel
+## Online usage (Kotlin) — connects to llmizeOFF server on cPanel
 
 ```kotlin
-import com.offllama.OffLlamaClient
+import com.llmizeoff.LlmizeOffClient
 import kotlinx.coroutines.launch
 
-val client = OffLlamaClient(
+val client = LlmizeOffClient(
     baseUrl = "https://tools.yourdomain.com/ai",
     apiKey  = "your-api-key",  // optional
 )

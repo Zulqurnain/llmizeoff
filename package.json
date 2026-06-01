@@ -1,6 +1,6 @@
 {
   "name": "llmizeoff",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "llmizeOFF — Self-hosted LLM runtime for VPS, cPanel, Android, and local tools. OpenAI-compatible. No cloud, no subscriptions. Live demo: zulqurnainj.com/chat",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
