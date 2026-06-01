@@ -37,10 +37,15 @@ exports.LlamaEngine = void 0;
 const path = __importStar(require("path"));
 const downloader_1 = require("./downloader");
 let cachedModule = null;
+// node-llama-cpp is ESM with top-level await. When this package is built to
+// CommonJS, TypeScript down-levels `import()` into a require()-based helper,
+// which throws on ESM-TLA modules. Using the Function constructor keeps a
+// genuine dynamic import() in the emitted JS, so it works from CJS and ESM alike.
+const nativeDynamicImport = new Function("specifier", "return import(specifier);");
 async function getLlamaCpp() {
     if (cachedModule)
         return cachedModule;
-    cachedModule = (await Promise.resolve().then(() => __importStar(require("node-llama-cpp"))));
+    cachedModule = await nativeDynamicImport("node-llama-cpp");
     return cachedModule;
 }
 /**
