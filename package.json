@@ -32,8 +32,12 @@
     "react-native-fs": ">=2.0.0"
   },
   "peerDependenciesMeta": {
-    "llama.rn": { "optional": true },
-    "react-native-fs": { "optional": true }
+    "llama.rn": {
+      "optional": true
+    },
+    "react-native-fs": {
+      "optional": true
+    }
   },
   "bin": {
     "llmizeoff": "dist/cli.js",
@@ -46,9 +50,23 @@
     "dev": "ts-node src/server.ts"
   },
   "keywords": [
-    "llmizeoff", "llmize", "offllama", "llama", "llm", "self-hosted", "cpanel",
-    "shared-hosting", "inference", "openai-compatible", "react-native",
-    "android", "browser", "edge", "offline-ai", "vps", "privacy"
+    "llmizeoff",
+    "llmize",
+    "offllama",
+    "llama",
+    "llm",
+    "self-hosted",
+    "cpanel",
+    "shared-hosting",
+    "inference",
+    "openai-compatible",
+    "react-native",
+    "android",
+    "browser",
+    "edge",
+    "offline-ai",
+    "vps",
+    "privacy"
   ],
   "author": "Zulqurnain Haider",
   "license": "MIT",
@@ -67,6 +85,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Zulqurnain/llmizeoff.git"
+    "url": "git+https://github.com/Zulqurnain/llmizeoff.git"
   }
 }
