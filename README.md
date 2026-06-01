@@ -115,7 +115,7 @@ console.log(reply); // "The capital of France is Paris."
 ```kotlin
 // build.gradle
 dependencies {
-    implementation("com.github.Zulqurnain:offllama-android:0.2.0")
+    implementation("com.github.Zulqurnain:llmizeoff-android:0.2.0")
 }
 ```
 
