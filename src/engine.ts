@@ -106,29 +106,23 @@ export class LlamaEngine {
     if (!this.session) await this.load(true);
   }
 
-  /**
-   * Compose the final prompt fed to the session.
-   * The system message (live context + instructions) is prepended to the last
-   * user turn so the model has it without polluting the chat template.
-   */
-  private composePrompt(messages: Message[]): string {
-    const system = messages.find((m) => m.role === "system")?.content;
-    const lastUser = [...messages].reverse().find((m) => m.role === "user")?.content ?? "";
-    return system
-      ? `[Context for this reply only]\n${system}\n\n---\n\n${lastUser}`
-      : lastUser;
-  }
-
   /** Non-streaming chat. Returns the full reply. */
   async chat(messages: Message[], opts: ChatOptions = {}): Promise<string> {
     await this.ensureLoaded();
-    const prompt = this.composePrompt(
-      opts.systemPrompt
-        ? [{ role: "system", content: opts.systemPrompt }, ...messages]
-        : messages
-    );
-    return this.enqueue(() =>
-      this.session!.prompt(prompt, {
+
+    const system = opts.systemPrompt ?? messages.find((m) => m.role === "system")?.content;
+    const lastUser = [...messages].reverse().find((m) => m.role === "user")?.content ?? "";
+
+    return this.enqueue(() => {
+      // CRITICAL: the single persistent session is reused across every request.
+      // Reset its history each call so prior conversations never bleed in and the
+      // context window can't overflow into degenerate output (e.g. "The answer is
+      // yes." on small models). Each request is fully stateless.
+      this.session!.resetChatHistory();
+      if (system) {
+        this.session!.setChatHistory([{ type: "system", text: system }]);
+      }
+      return this.session!.prompt(lastUser, {
         maxTokens: opts.maxTokens ?? 512,
         temperature: opts.temperature ?? 0.7,
         topP: opts.topP ?? 0.9,
@@ -136,8 +130,8 @@ export class LlamaEngine {
         ...(opts.onToken
           ? { onTextChunk: (chunk: string) => opts.onToken!(chunk) }
           : {}),
-      })
-    );
+      });
+    });
   }
 
   /**
