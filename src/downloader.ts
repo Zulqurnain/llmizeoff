@@ -11,11 +11,23 @@ export interface ModelInfo {
 }
 
 export const BUNDLED_MODELS: Record<string, ModelInfo> = {
+  "smollm2-360m": {
+    name: "SmolLM2-360M-Instruct Q8_0",
+    url: "https://huggingface.co/HuggingFaceTB/SmolLM2-360M-Instruct-GGUF/resolve/main/smollm2-360m-instruct-q8_0.gguf",
+    sizeBytes: 386_000_000,
+    description: "Default. ~370MB, extremely fast on CPU (first token ~1-2s). Best for snappy chat on a VPS or cPanel.",
+  },
+  "smollm2-1.7b": {
+    name: "SmolLM2-1.7B-Instruct Q4_K_M",
+    url: "https://huggingface.co/HuggingFaceTB/SmolLM2-1.7B-Instruct-GGUF/resolve/main/smollm2-1.7b-instruct-q4_k_m.gguf",
+    sizeBytes: 1_060_000_000,
+    description: "Higher quality. ~1GB. Needs ~1.5GB RAM. Slower than 360M but stronger reasoning.",
+  },
   "qwen2.5-0.5b": {
     name: "Qwen2.5-0.5B-Instruct Q4_K_M",
     url: "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/qwen2.5-0.5b-instruct-q4_k_m.gguf",
     sizeBytes: 397_000_000,
-    description: "Tiny but capable. ~400MB. Fits in 512MB RAM. Best for cPanel shared hosting.",
+    description: "Tiny but capable. ~400MB. Fits in 512MB RAM.",
   },
   "qwen2.5-1.5b": {
     name: "Qwen2.5-1.5B-Instruct Q4_K_M",
@@ -23,15 +35,9 @@ export const BUNDLED_MODELS: Record<string, ModelInfo> = {
     sizeBytes: 986_000_000,
     description: "Better quality. ~1GB. Needs 1.5GB RAM.",
   },
-  "tinyllama": {
-    name: "TinyLlama-1.1B Chat Q4_K_M",
-    url: "https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/tinyllama-1.1b-chat-v1.0.q4_k_m.gguf",
-    sizeBytes: 668_000_000,
-    description: "~670MB. Good balance of size and quality.",
-  },
 };
 
-export const DEFAULT_MODEL = "qwen2.5-0.5b";
+export const DEFAULT_MODEL = "smollm2-360m";
 
 export function getDefaultModelDir(): string {
   return path.join(process.env.OFFL_LLAMA_MODEL_DIR || path.join(process.cwd(), "models"));
