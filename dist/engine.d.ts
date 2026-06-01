@@ -26,12 +26,6 @@ export declare class LlamaEngine {
     /** Pre-warm the session so the first real request doesn't pay cold-start cost. */
     warmup(): Promise<void>;
     private ensureLoaded;
-    /**
-     * Compose the final prompt fed to the session.
-     * The system message (live context + instructions) is prepended to the last
-     * user turn so the model has it without polluting the chat template.
-     */
-    private composePrompt;
     /** Non-streaming chat. Returns the full reply. */
     chat(messages: Message[], opts?: ChatOptions): Promise<string>;
     /**
