@@ -42,11 +42,17 @@ const path = __importStar(require("path"));
 const https = __importStar(require("https"));
 const http = __importStar(require("http"));
 exports.BUNDLED_MODELS = {
+    "llama3.2-1b": {
+        name: "Llama 3.2 1B Instruct Q4_K_M",
+        url: "https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q4_K_M.gguf",
+        sizeBytes: 808_000_000,
+        description: "Default. ~770MB. Meta's Llama 3.2 1B — good quality, fast on CPU (first token ~2-3s). Best speed/quality balance for a CPU VPS.",
+    },
     "gemma2-2b": {
         name: "Gemma 2 2B Instruct Q4_K_M",
         url: "https://huggingface.co/lmstudio-community/gemma-2-2b-it-GGUF/resolve/main/gemma-2-2b-it-Q4_K_M.gguf",
         sizeBytes: 1_708_000_000,
-        description: "Default. ~1.6GB. Google's Gemma 2 2B — strong quality for its size. Needs ~2.5GB RAM. Best quality/speed balance on a CPU VPS.",
+        description: "Higher quality, slower. ~1.6GB. Google's Gemma 2 2B. Needs ~2.5GB RAM.",
     },
     "smollm2-360m": {
         name: "SmolLM2-360M-Instruct Q8_0",
@@ -73,7 +79,7 @@ exports.BUNDLED_MODELS = {
         description: "Better quality. ~1GB. Needs 1.5GB RAM.",
     },
 };
-exports.DEFAULT_MODEL = "gemma2-2b";
+exports.DEFAULT_MODEL = "llama3.2-1b";
 function getDefaultModelDir() {
     return path.join(process.env.OFFL_LLAMA_MODEL_DIR || path.join(process.cwd(), "models"));
 }
