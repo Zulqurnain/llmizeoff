@@ -1,8 +1,8 @@
 /**
- * offLLama React Native adapter — offline AI on Android & iOS.
+ * llmizeOFF React Native adapter — offline AI on Android & iOS.
  *
  * Wraps `llama.rn` for on-device inference (no server needed).
- * Falls back to OffLlamaClient (HTTP) when a server URL is configured.
+ * Falls back to LlmizeOffClient (HTTP) when a server URL is configured.
  *
  * App bundle stays < 100 MB because the model is downloaded at runtime
  * to the device's documents/cache directory — NOT bundled with the app.
@@ -15,7 +15,7 @@
  *
  * USAGE
  * -----
- * import { createMobileEngine } from 'offllama/react-native';
+ * import { createMobileEngine } from 'llmizeoff/react-native';
  *
  * // Offline (on-device) — downloads ~300 MB on first use
  * const engine = await createMobileEngine({
@@ -34,12 +34,12 @@
  * });
  */
 
-import { OffLlamaClient } from "./client";
+import { LlmizeOffClient } from "./client";
 import type { ClientMessage } from "./client";
 
 export interface MobileEngineConfig {
   /**
-   * Remote offLLama server URL. When set, uses HTTP (no local model needed).
+   * Remote llmizeOFF server URL. When set, uses HTTP (no local model needed).
    * Example: "https://tools.example.com/ai"
    */
   serverUrl?: string;
@@ -77,7 +77,7 @@ export interface MobileEngineConfig {
 export interface MobileEngine {
   /**
    * Send a message and get a reply.
-   * Equivalent to OffLlamaClient.ask().
+   * Equivalent to LlmizeOffClient.ask().
    */
   ask(
     userMessage: string,
@@ -103,10 +103,10 @@ export interface MobileEngine {
 
 class RemoteMobileEngine implements MobileEngine {
   readonly mode = "remote" as const;
-  private client: OffLlamaClient;
+  private client: LlmizeOffClient;
 
   constructor(config: MobileEngineConfig) {
-    this.client = new OffLlamaClient({
+    this.client = new LlmizeOffClient({
       baseUrl: config.serverUrl!,
       apiKey: config.apiKey,
     });
@@ -179,7 +179,7 @@ export async function createMobileEngine(config: MobileEngineConfig): Promise<Mo
 
   if (!config.modelUrl) {
     throw new Error(
-      "offLLama: provide either serverUrl (HTTP mode) or modelUrl (offline mode)"
+      "llmizeOFF: provide either serverUrl (HTTP mode) or modelUrl (offline mode)"
     );
   }
 
@@ -191,7 +191,7 @@ export async function createMobileEngine(config: MobileEngineConfig): Promise<Mo
     llamaRn = await (eval('import("llama.rn")') as Promise<any>);
   } catch {
     throw new Error(
-      "offLLama: offline mode requires 'llama.rn'. Run: npm install llama.rn\n" +
+      "llmizeOFF: offline mode requires 'llama.rn'. Run: npm install llama.rn\n" +
       "iOS: cd ios && pod install\n" +
       "Or switch to HTTP mode by providing serverUrl instead."
     );
@@ -229,7 +229,7 @@ async function ensureModel(
       dir = RNFS.DocumentDirectoryPath;
     } catch {
       throw new Error(
-        "offLLama: install react-native-fs to auto-resolve model dir, " +
+        "llmizeOFF: install react-native-fs to auto-resolve model dir, " +
         "or pass modelDir explicitly."
       );
     }

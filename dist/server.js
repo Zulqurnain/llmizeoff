@@ -80,7 +80,7 @@ function createServer(config = {}) {
                     id: engine.getModelName(),
                     object: "model",
                     created: Math.floor(Date.now() / 1000),
-                    owned_by: "offl-llama",
+                    owned_by: "llmizeoff",
                 }],
         });
     });
@@ -165,7 +165,7 @@ async function startServer(config = {}) {
     const host = config.host ?? process.env.HOSTNAME ?? "0.0.0.0";
     const app = createServer(config);
     app.listen(port, host, () => {
-        console.log(`offl-llama server running on http://${host}:${port}`);
+        console.log(`llmizeOFF server running on http://${host}:${port}`);
         console.log(`Health check: http://${host}:${port}/health`);
         console.log(`Chat API:     POST http://${host}:${port}/v1/chat/completions`);
     });

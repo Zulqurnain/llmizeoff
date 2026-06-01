@@ -1,14 +1,14 @@
 /**
- * offLLama Client — zero-dependency HTTP client for the offLLama server.
+ * llmizeOFF Client — zero-dependency HTTP client for the llmizeOFF server.
  *
  * Works in any JavaScript environment: browser, React Native, Node.js,
  * Bun, Deno, Electron, Kotlin/JS, etc.
  *
- * Use this to connect your app to a self-hosted offLLama server on
+ * Use this to connect your app to a self-hosted llmizeOFF server on
  * cPanel / shared hosting / VPS without exposing credentials client-side.
  */
 export interface ClientConfig {
-    /** Base URL of your offLLama server, e.g. "https://tools.example.com/ai" */
+    /** Base URL of your llmizeOFF server, e.g. "https://tools.example.com/ai" */
     baseUrl: string;
     /** Optional API key (set OFFL_LLAMA_API_KEY on the server) */
     apiKey?: string;
@@ -67,7 +67,7 @@ export interface ModelList {
         object: "model";
     }>;
 }
-export declare class OffLlamaClient {
+export declare class LlmizeOffClient {
     private readonly base;
     private readonly headers;
     private readonly timeout;
@@ -107,10 +107,12 @@ export declare class OffLlamaClient {
     complete(prompt: string, opts?: Omit<CompletionRequest, "prompt">): Promise<CompletionResponse>;
     private _fetch;
 }
-export declare class OffLlamaError extends Error {
+export declare class LlmizeOffError extends Error {
     readonly status: number;
     constructor(status: number, message: string);
 }
 /** Convenience factory */
-export declare function createClient(config: ClientConfig): OffLlamaClient;
+export declare function createClient(config: ClientConfig): LlmizeOffClient;
+export declare const OffLlamaError: typeof LlmizeOffError;
+export declare const OffLlamaClient: typeof LlmizeOffClient;
 //# sourceMappingURL=client.d.ts.map

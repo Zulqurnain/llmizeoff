@@ -1,9 +1,9 @@
 "use strict";
 /**
- * offLLama React Native adapter — offline AI on Android & iOS.
+ * llmizeOFF React Native adapter — offline AI on Android & iOS.
  *
  * Wraps `llama.rn` for on-device inference (no server needed).
- * Falls back to OffLlamaClient (HTTP) when a server URL is configured.
+ * Falls back to LlmizeOffClient (HTTP) when a server URL is configured.
  *
  * App bundle stays < 100 MB because the model is downloaded at runtime
  * to the device's documents/cache directory — NOT bundled with the app.
@@ -16,7 +16,7 @@
  *
  * USAGE
  * -----
- * import { createMobileEngine } from 'offllama/react-native';
+ * import { createMobileEngine } from 'llmizeoff/react-native';
  *
  * // Offline (on-device) — downloads ~300 MB on first use
  * const engine = await createMobileEngine({
@@ -43,7 +43,7 @@ const client_1 = require("./client");
 class RemoteMobileEngine {
     constructor(config) {
         this.mode = "remote";
-        this.client = new client_1.OffLlamaClient({
+        this.client = new client_1.LlmizeOffClient({
             baseUrl: config.serverUrl,
             apiKey: config.apiKey,
         });
@@ -102,7 +102,7 @@ async function createMobileEngine(config) {
         return new RemoteMobileEngine(config);
     }
     if (!config.modelUrl) {
-        throw new Error("offLLama: provide either serverUrl (HTTP mode) or modelUrl (offline mode)");
+        throw new Error("llmizeOFF: provide either serverUrl (HTTP mode) or modelUrl (offline mode)");
     }
     // Try to load llama.rn dynamically so this file doesn't crash in non-RN envs
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -112,7 +112,7 @@ async function createMobileEngine(config) {
         llamaRn = await eval('import("llama.rn")');
     }
     catch {
-        throw new Error("offLLama: offline mode requires 'llama.rn'. Run: npm install llama.rn\n" +
+        throw new Error("llmizeOFF: offline mode requires 'llama.rn'. Run: npm install llama.rn\n" +
             "iOS: cd ios && pod install\n" +
             "Or switch to HTTP mode by providing serverUrl instead.");
     }
@@ -140,7 +140,7 @@ _llamaRn) {
             dir = RNFS.DocumentDirectoryPath;
         }
         catch {
-            throw new Error("offLLama: install react-native-fs to auto-resolve model dir, " +
+            throw new Error("llmizeOFF: install react-native-fs to auto-resolve model dir, " +
                 "or pass modelDir explicitly.");
         }
     }

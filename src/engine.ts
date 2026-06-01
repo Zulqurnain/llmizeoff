@@ -43,7 +43,7 @@ export class LlamaEngine {
       const fs = await import("fs");
       if (!fs.existsSync(modelPath)) {
         if (!autoDownload) {
-          throw new Error(`Model not found at ${modelPath}. Run: npx offllama download`);
+          throw new Error(`Model not found at ${modelPath}. Run: npx llmizeoff download`);
         }
         console.log("Model not found locally. Auto-downloading (this happens once)...");
         await downloadModel(DEFAULT_MODEL);
