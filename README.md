@@ -1,7 +1,7 @@
 # llmizeOFF
 
-> **offllama** is being evolved into **llmizeOFF** — a smarter, more production-ready self-hosted LLM runtime and toolkit.
-> The npm package stays `offllama` for backward compatibility. The new brand is **llmizeOFF**.
+> Formerly **offllama**. Now packaged as **`llmizeoff`** — a smarter, more production-ready self-hosted LLM runtime and toolkit.
+> Migrating? `npm install llmizeoff` and change imports from `offllama` → `llmizeoff`. The old `OffLlamaClient` / `OffLlamaError` names still work as aliases.
 
 **Try it live → [zulqurnainj.com/chat](https://zulqurnainj.com/chat)** · Nayab is the hosted demo of llmizeOFF
 
@@ -9,7 +9,7 @@
 
 Run LLM inference on **any host** — cPanel shared hosting, VPS, Raspberry Pi, Android — with zero cloud dependencies, no subscriptions, and no external lock-in.
 
-[![npm](https://img.shields.io/npm/v/offllama?style=flat-square)](https://www.npmjs.com/package/offllama)
+[![npm](https://img.shields.io/npm/v/llmizeoff?style=flat-square)](https://www.npmjs.com/package/llmizeoff)
 [![license](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 [![Ko-fi](https://img.shields.io/badge/Support-Ko--fi-orange?style=flat-square)](https://ko-fi.com/zulqurnainjj)
 
@@ -19,7 +19,7 @@ Run LLM inference on **any host** — cPanel shared hosting, VPS, Raspberry Pi, 
 
 ## What is llmizeOFF?
 
-llmizeOFF (packaged as `offllama`) is an open-source LLM runtime designed to run where cloud AI cannot:
+llmizeOFF (npm: `llmizeoff`) is an open-source LLM runtime designed to run where cloud AI cannot:
 
 - **$5/month VPS** — works on the smallest DigitalOcean or Hetzner droplets
 - **cPanel shared hosting** — deploys as a Node.js app without root access
@@ -41,10 +41,10 @@ No GPU required. No monthly API bills. No data sent to third parties.
 
 | Export | Environment | Description |
 |--------|-------------|-------------|
-| `offllama` (default) | Node.js / cPanel | Embedded inference via `node-llama-cpp` + OpenAI-compatible HTTP server |
-| `offllama/client` | Browser, RN, Node.js, Deno, Bun | Zero-dependency HTTP client for any llmizeOFF server |
-| `offllama/react-native` | React Native (iOS + Android) | Offline on-device inference via `llama.rn` OR HTTP fallback |
-| `offllama/nano` | Any | Zero-model regex extraction + template message builders |
+| `llmizeoff` (default) | Node.js / cPanel | Embedded inference via `node-llama-cpp` + OpenAI-compatible HTTP server |
+| `llmizeoff/client` | Browser, RN, Node.js, Deno, Bun | Zero-dependency HTTP client for any llmizeOFF server |
+| `llmizeoff/react-native` | React Native (iOS + Android) | Offline on-device inference via `llama.rn` OR HTTP fallback |
+| `llmizeoff/nano` | Any | Zero-model regex extraction + template message builders |
 | `android/` | Kotlin / Android native | Full JNI/NDK library — 100% offline, no server needed |
 
 ---
@@ -52,13 +52,13 @@ No GPU required. No monthly API bills. No data sent to third parties.
 ## Quick start (Node.js / VPS / cPanel)
 
 ```bash
-npm install offllama
+npm install llmizeoff
 
 # Download recommended model (Qwen 2.5-1.5B ~1.1GB — best quality/speed on CPU)
-npx offl-llama download
+npx llmizeoff download
 
 # Start OpenAI-compatible server with real token streaming
-npx offl-llama serve --port 8080 --api-key my-secret
+npx llmizeoff serve --port 8080 --api-key my-secret
 ```
 
 Call it from anywhere:
@@ -95,7 +95,7 @@ For **sub-1-second** responses, pair llmizeOFF with [Groq](https://groq.com) (fr
 ## Embed in Next.js / Express
 
 ```ts
-import { LlamaEngine } from "offllama";
+import { LlamaEngine } from "llmizeoff";
 
 const llama = new LlamaEngine({ contextSize: 2048 });
 await llama.load(); // auto-downloads Qwen 2.5-1.5B on first run
@@ -132,9 +132,9 @@ val reply = engine.chat("Explain recursion in one sentence.")
 Works in browser, React Native, Node.js, Deno, and Bun — zero dependencies:
 
 ```ts
-import { OffLlamaClient } from "offllama/client";
+import { LlmizeOffClient } from "llmizeoff/client";
 
-const client = new OffLlamaClient({
+const client = new LlmizeOffClient({
   baseUrl: "https://your-server.example.com:8080",
   apiKey: "my-secret",
 });
@@ -153,13 +153,13 @@ for await (const token of client.streamChat([
 
 ```bash
 # 1. Install
-npm install offllama pm2 -g
+npm install llmizeoff pm2 -g
 
 # 2. Download model
-npx offl-llama download --model qwen2.5-1.5b
+npx llmizeoff download --model qwen2.5-1.5b
 
 # 3. Start with PM2
-pm2 start node_modules/offllama/dist/server.js \
+pm2 start node_modules/llmizeoff/dist/server.js \
   --name llmizeoff \
   --env PORT=8080,HOSTNAME=127.0.0.1,OFFLLAMA_API_KEY=your-key
 

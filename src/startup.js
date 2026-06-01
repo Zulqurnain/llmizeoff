@@ -1,5 +1,5 @@
 /**
- * cPanel startup file for offl-llama server.
+ * cPanel startup file for llmizeOFF server.
  *
  * Set this as the startup file in cPanel → Setup Node.js App.
  * Reads env from .env file if present, then starts the server.

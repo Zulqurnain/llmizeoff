@@ -39,7 +39,7 @@ const downloader_1 = require("./downloader");
 const engine_1 = require("./engine");
 const server_1 = require("./server");
 const program = new commander_1.Command();
-program.name("offl-llama").description("Run llama.cpp on any Node.js host — no VPS required").version("0.1.0");
+program.name("llmizeoff").description("Run llama.cpp on any Node.js host — no VPS required").version("0.1.0");
 program
     .command("download [model]")
     .description(`Download a GGUF model. Available: ${Object.keys(downloader_1.BUNDLED_MODELS).join(", ")}`)
@@ -91,7 +91,7 @@ program
     const readline = await Promise.resolve().then(() => __importStar(require("readline")));
     const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
     const history = [];
-    console.log(`\noffl-llama chat — model: ${engine.getModelName()}`);
+    console.log(`\nllmizeoff chat — model: ${engine.getModelName()}`);
     console.log("Type 'exit' to quit.\n");
     const ask = () => {
         rl.question("You: ", async (input) => {

@@ -5,7 +5,7 @@ import { LlamaEngine } from "./engine";
 import { startServer } from "./server";
 
 const program = new Command();
-program.name("offl-llama").description("Run llama.cpp on any Node.js host — no VPS required").version("0.1.0");
+program.name("llmizeoff").description("Run llama.cpp on any Node.js host — no VPS required").version("0.1.0");
 
 program
   .command("download [model]")
@@ -62,7 +62,7 @@ program
     const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
     const history: Array<{ role: "user" | "assistant"; content: string }> = [];
 
-    console.log(`\noffl-llama chat — model: ${engine.getModelName()}`);
+    console.log(`\nllmizeoff chat — model: ${engine.getModelName()}`);
     console.log("Type 'exit' to quit.\n");
 
     const ask = () => {

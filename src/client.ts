@@ -1,15 +1,15 @@
 /**
- * offLLama Client — zero-dependency HTTP client for the offLLama server.
+ * llmizeOFF Client — zero-dependency HTTP client for the llmizeOFF server.
  *
  * Works in any JavaScript environment: browser, React Native, Node.js,
  * Bun, Deno, Electron, Kotlin/JS, etc.
  *
- * Use this to connect your app to a self-hosted offLLama server on
+ * Use this to connect your app to a self-hosted llmizeOFF server on
  * cPanel / shared hosting / VPS without exposing credentials client-side.
  */
 
 export interface ClientConfig {
-  /** Base URL of your offLLama server, e.g. "https://tools.example.com/ai" */
+  /** Base URL of your llmizeOFF server, e.g. "https://tools.example.com/ai" */
   baseUrl: string;
   /** Optional API key (set OFFL_LLAMA_API_KEY on the server) */
   apiKey?: string;
@@ -60,7 +60,7 @@ export interface ModelList {
   data: Array<{ id: string; object: "model" }>;
 }
 
-export class OffLlamaClient {
+export class LlmizeOffClient {
   private readonly base: string;
   private readonly headers: Record<string, string>;
   private readonly timeout: number;
@@ -102,7 +102,7 @@ export class OffLlamaClient {
       method: "POST",
       body: JSON.stringify({ ...opts, messages, stream: false }),
     });
-    if (!r.ok) throw new OffLlamaError(r.status, await r.text());
+    if (!r.ok) throw new LlmizeOffError(r.status, await r.text());
     return r.json() as Promise<ChatResponse>;
   }
 
@@ -138,7 +138,7 @@ export class OffLlamaClient {
       method: "POST",
       body: JSON.stringify({ ...opts, prompt }),
     });
-    if (!r.ok) throw new OffLlamaError(r.status, await r.text());
+    if (!r.ok) throw new LlmizeOffError(r.status, await r.text());
     return r.json() as Promise<CompletionResponse>;
   }
 
@@ -160,14 +160,18 @@ export class OffLlamaClient {
   }
 }
 
-export class OffLlamaError extends Error {
+export class LlmizeOffError extends Error {
   constructor(public readonly status: number, message: string) {
-    super(`offLLama HTTP ${status}: ${message}`);
-    this.name = "OffLlamaError";
+    super(`llmizeOFF HTTP ${status}: ${message}`);
+    this.name = "LlmizeOffError";
   }
 }
 
 /** Convenience factory */
-export function createClient(config: ClientConfig): OffLlamaClient {
-  return new OffLlamaClient(config);
+export function createClient(config: ClientConfig): LlmizeOffClient {
+  return new LlmizeOffClient(config);
 }
+
+// Backward-compatible aliases (pre-0.3.0 names)
+export const OffLlamaError = LlmizeOffError;
+export const OffLlamaClient = LlmizeOffClient;

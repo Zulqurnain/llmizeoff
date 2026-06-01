@@ -5,7 +5,8 @@ export { downloadModel, getModelPath, getDefaultModelDir, BUNDLED_MODELS, DEFAUL
 export type { Message, ChatOptions, CompletionOptions, ModelConfig, ServerConfig, OpenAIChatResponse } from "./types";
 
 // Universal HTTP client — works in browser, Kotlin/JS, Node.js, Deno, Bun
-export { OffLlamaClient, OffLlamaError, createClient } from "./client";
+// LlmizeOff* are the canonical names; OffLlama* kept as aliases for compatibility.
+export { LlmizeOffClient, LlmizeOffError, OffLlamaClient, OffLlamaError, createClient } from "./client";
 export type { ClientConfig, ClientMessage, ChatRequest, CompletionRequest, ChatResponse, CompletionResponse, ModelList } from "./client";
 
 // React Native adapter — offline on-device inference via llama.rn + HTTP fallback

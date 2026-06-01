@@ -1,7 +1,7 @@
 {
-  "name": "offllama",
-  "version": "0.2.0",
-  "description": "llmizeOFF (offllama) — Self-hosted LLM runtime for VPS, cPanel, Android, and local tools. OpenAI-compatible. No cloud, no subscriptions. Live demo: zulqurnainj.com/chat",
+  "name": "llmizeoff",
+  "version": "0.3.0",
+  "description": "llmizeOFF — Self-hosted LLM runtime for VPS, cPanel, Android, and local tools. OpenAI-compatible. No cloud, no subscriptions. Live demo: zulqurnainj.com/chat",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
@@ -36,6 +36,7 @@
     "react-native-fs": { "optional": true }
   },
   "bin": {
+    "llmizeoff": "dist/cli.js",
     "offl-llama": "dist/cli.js"
   },
   "scripts": {
@@ -45,7 +46,7 @@
     "dev": "ts-node src/server.ts"
   },
   "keywords": [
-    "llmizeoff", "offllama", "llama", "llm", "self-hosted", "cpanel",
+    "llmizeoff", "llmize", "offllama", "llama", "llm", "self-hosted", "cpanel",
     "shared-hosting", "inference", "openai-compatible", "react-native",
     "android", "browser", "edge", "offline-ai", "vps", "privacy"
   ],

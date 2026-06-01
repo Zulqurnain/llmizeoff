@@ -1,8 +1,8 @@
 /**
- * offLLama React Native adapter — offline AI on Android & iOS.
+ * llmizeOFF React Native adapter — offline AI on Android & iOS.
  *
  * Wraps `llama.rn` for on-device inference (no server needed).
- * Falls back to OffLlamaClient (HTTP) when a server URL is configured.
+ * Falls back to LlmizeOffClient (HTTP) when a server URL is configured.
  *
  * App bundle stays < 100 MB because the model is downloaded at runtime
  * to the device's documents/cache directory — NOT bundled with the app.
@@ -15,7 +15,7 @@
  *
  * USAGE
  * -----
- * import { createMobileEngine } from 'offllama/react-native';
+ * import { createMobileEngine } from 'llmizeoff/react-native';
  *
  * // Offline (on-device) — downloads ~300 MB on first use
  * const engine = await createMobileEngine({
@@ -36,7 +36,7 @@
 import type { ClientMessage } from "./client";
 export interface MobileEngineConfig {
     /**
-     * Remote offLLama server URL. When set, uses HTTP (no local model needed).
+     * Remote llmizeOFF server URL. When set, uses HTTP (no local model needed).
      * Example: "https://tools.example.com/ai"
      */
     serverUrl?: string;
@@ -67,7 +67,7 @@ export interface MobileEngineConfig {
 export interface MobileEngine {
     /**
      * Send a message and get a reply.
-     * Equivalent to OffLlamaClient.ask().
+     * Equivalent to LlmizeOffClient.ask().
      */
     ask(userMessage: string, opts?: {
         systemPrompt?: string;

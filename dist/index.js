@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.buildOutreachMessage = exports.buildOutreachEmail = exports.extractLeads = exports.MOBILE_MODELS = exports.isModelDownloaded = exports.createMobileEngine = exports.createClient = exports.OffLlamaError = exports.OffLlamaClient = exports.DEFAULT_MODEL = exports.BUNDLED_MODELS = exports.getDefaultModelDir = exports.getModelPath = exports.downloadModel = exports.startServer = exports.createServer = exports.LlamaEngine = void 0;
+exports.buildOutreachMessage = exports.buildOutreachEmail = exports.extractLeads = exports.MOBILE_MODELS = exports.isModelDownloaded = exports.createMobileEngine = exports.createClient = exports.OffLlamaError = exports.OffLlamaClient = exports.LlmizeOffError = exports.LlmizeOffClient = exports.DEFAULT_MODEL = exports.BUNDLED_MODELS = exports.getDefaultModelDir = exports.getModelPath = exports.downloadModel = exports.startServer = exports.createServer = exports.LlamaEngine = void 0;
 // Server-side (Node.js / cPanel) — runs llama.cpp inference embedded
 var engine_1 = require("./engine");
 Object.defineProperty(exports, "LlamaEngine", { enumerable: true, get: function () { return engine_1.LlamaEngine; } });
@@ -14,7 +14,10 @@ Object.defineProperty(exports, "getDefaultModelDir", { enumerable: true, get: fu
 Object.defineProperty(exports, "BUNDLED_MODELS", { enumerable: true, get: function () { return downloader_1.BUNDLED_MODELS; } });
 Object.defineProperty(exports, "DEFAULT_MODEL", { enumerable: true, get: function () { return downloader_1.DEFAULT_MODEL; } });
 // Universal HTTP client — works in browser, Kotlin/JS, Node.js, Deno, Bun
+// LlmizeOff* are the canonical names; OffLlama* kept as aliases for compatibility.
 var client_1 = require("./client");
+Object.defineProperty(exports, "LlmizeOffClient", { enumerable: true, get: function () { return client_1.LlmizeOffClient; } });
+Object.defineProperty(exports, "LlmizeOffError", { enumerable: true, get: function () { return client_1.LlmizeOffError; } });
 Object.defineProperty(exports, "OffLlamaClient", { enumerable: true, get: function () { return client_1.OffLlamaClient; } });
 Object.defineProperty(exports, "OffLlamaError", { enumerable: true, get: function () { return client_1.OffLlamaError; } });
 Object.defineProperty(exports, "createClient", { enumerable: true, get: function () { return client_1.createClient; } });
