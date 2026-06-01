@@ -1,7 +1,7 @@
 {
   "name": "offllama",
   "version": "0.2.0",
-  "description": "offLLama — Run llama.cpp inference on any Node.js host (cPanel, shared hosting). Universal HTTP client for browser, React Native, Kotlin/JS. No VPS or GPU required.",
+  "description": "llmizeOFF (offllama) — Self-hosted LLM runtime for VPS, cPanel, Android, and local tools. OpenAI-compatible. No cloud, no subscriptions. Live demo: zulqurnainj.com/chat",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
@@ -45,8 +45,9 @@
     "dev": "ts-node src/server.ts"
   },
   "keywords": [
-    "offllama", "llama", "llm", "cpanel", "shared-hosting", "inference",
-    "openai-compatible", "react-native", "browser", "edge", "offline-ai"
+    "llmizeoff", "offllama", "llama", "llm", "self-hosted", "cpanel",
+    "shared-hosting", "inference", "openai-compatible", "react-native",
+    "android", "browser", "edge", "offline-ai", "vps", "privacy"
   ],
   "author": "Zulqurnain Haider",
   "license": "MIT",
