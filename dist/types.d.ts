@@ -6,6 +6,12 @@ export interface ChatOptions {
     maxTokens?: number;
     temperature?: number;
     systemPrompt?: string;
+    /** Penalise repetition (default 1.1). */
+    repeatPenalty?: number;
+    /** Top-p nucleus sampling (default 0.9). */
+    topP?: number;
+    /** Called with each decoded text chunk as it streams. */
+    onToken?: (text: string) => void;
 }
 export interface CompletionOptions {
     maxTokens?: number;

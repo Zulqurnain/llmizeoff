@@ -47,9 +47,11 @@ function createServer(config = {}) {
     const engine = new engine_1.LlamaEngine(config);
     let engineReady = false;
     let engineError = null;
-    // Load model in background on startup
-    engine.load(true).then(() => {
+    // Load model in background on startup, then warm it up
+    engine.load(true).then(async () => {
+        await engine.warmup();
         engineReady = true;
+        console.log("Engine warmed up and ready.");
     }).catch((err) => {
         engineError = err;
         console.error("Failed to load model:", err.message);
@@ -95,11 +97,37 @@ function createServer(config = {}) {
             }
             return;
         }
-        const { messages, max_tokens, temperature } = req.body;
+        const { messages, max_tokens, temperature, stream } = req.body;
         if (!Array.isArray(messages) || messages.length === 0) {
             res.status(400).json({ error: { message: "messages array is required" } });
             return;
         }
+        // ── Streaming (SSE) — OpenAI-compatible chat.completion.chunk events ──
+        if (stream) {
+            res.setHeader("Content-Type", "text/event-stream");
+            res.setHeader("Cache-Control", "no-cache");
+            res.setHeader("Connection", "keep-alive");
+            res.setHeader("X-Accel-Buffering", "no");
+            res.flushHeaders?.();
+            const id = "chatcmpl-" + crypto.randomBytes(8).toString("hex");
+            const created = Math.floor(Date.now() / 1000);
+            try {
+                await engine.chatStream(messages, (text) => {
+                    res.write(`data: ${JSON.stringify({
+                        id, object: "chat.completion.chunk", created, model: engine.getModelName(),
+                        choices: [{ index: 0, delta: { content: text }, finish_reason: null }],
+                    })}\n\n`);
+                }, { maxTokens: max_tokens ?? 512, temperature: temperature ?? 0.7 });
+            }
+            catch (err) {
+                const message = err instanceof Error ? err.message : String(err);
+                res.write(`data: ${JSON.stringify({ error: { message } })}\n\n`);
+            }
+            res.write("data: [DONE]\n\n");
+            res.end();
+            return;
+        }
+        // ── Non-streaming ──
         try {
             const text = await engine.chat(messages, {
                 maxTokens: max_tokens ?? 512,
@@ -115,11 +143,7 @@ function createServer(config = {}) {
                         message: { role: "assistant", content: text },
                         finish_reason: "stop",
                     }],
-                usage: {
-                    prompt_tokens: 0,
-                    completion_tokens: 0,
-                    total_tokens: 0,
-                },
+                usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
             };
             res.json(response);
         }
