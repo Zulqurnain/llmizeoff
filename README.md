@@ -202,3 +202,7 @@ The core runtime stays open-source and free forever. The upcoming Pro edition ad
 ## License
 
 MIT © [Zulqurnain Haider](https://zulqurnainj.com)
+
+## Recent changes
+
+- 2026-10-20: Commit history tidied up: every commit is now credited to Zulqurnain.
